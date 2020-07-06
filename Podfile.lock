@@ -1,0 +1,29 @@
+PODS:
+  - Alamofire (5.2.1)
+  - Stripe (19.3.0)
+
+DEPENDENCIES:
+  - Alamofire
+  - Stripe (from `https://github.com/stripe/stripe-ios.git`, branch `TEMP-add-oxxo-payment-method-beta-header`)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+
+EXTERNAL SOURCES:
+  Stripe:
+    :branch: TEMP-add-oxxo-payment-method-beta-header
+    :git: https://github.com/stripe/stripe-ios.git
+
+CHECKOUT OPTIONS:
+  Stripe:
+    :commit: d0c1cac0746d73b3167a477d01738e993798b83a
+    :git: https://github.com/stripe/stripe-ios.git
+
+SPEC CHECKSUMS:
+  Alamofire: e911732990610fe89af59ac0077f923d72dc3dfd
+  Stripe: dd5bfdd5f1daed4f9ddbfb47e9449ec302f9f708
+
+PODFILE CHECKSUM: fe1edb412cc6217394a2ca942508c0f7d0845ded
+
+COCOAPODS: 1.9.3
