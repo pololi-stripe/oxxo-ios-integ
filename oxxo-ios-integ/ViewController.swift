@@ -21,7 +21,7 @@ class ViewController: UIViewController, STPAuthenticationContext {
     var outputTextView = UITextView()
 
     #warning("Please use your own backend url below")
-    let backendURL : String = "https://example.com/"
+    let backendURL : String = "https://immense-dawn-75083.herokuapp.com/"
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -108,7 +108,82 @@ class ViewController: UIViewController, STPAuthenticationContext {
         // 1) [server-side] Create a PaymentIntent
         // 2) [client-side] Confirm the PaymentIntent
 
+        // make a POST request to the /create_payment_intent endpoint
+        self.createPaymentIntent { (paymentIntentResponse, error) in
+            if let error = error {
+                self.stopLoading()
+                self.displayStatus(error.localizedDescription)
+                print(error)
+                return
+            }
+            else {
+                guard let responseDictionary = paymentIntentResponse as? [String: AnyObject] else {
+                    print("Incorrect response")
+                    return
+                }
+
+                print(responseDictionary)
+                let clientSecret = responseDictionary["secret"] as! String
+
+                self.displayStatus("PaymentIntent created")
+
+                // Confirm the PaymentIntent using STPPaymentHandler
+                // implement delegates for STPAuthenticationContext
+                let billingDetails = STPPaymentMethodBillingDetails()
+                billingDetails.name = self.fullname.text
+                billingDetails.email = self.email.text
+
+                let paymentIntentParams = STPPaymentIntentParams(clientSecret: clientSecret)
+                let oxxoParams = STPPaymentMethodOXXOParams()
+                paymentIntentParams.paymentMethodParams = STPPaymentMethodParams(
+                    oxxo: oxxoParams,
+                    billingDetails: billingDetails,
+                    metadata: nil
+                )
+
+                STPPaymentHandler.shared().confirmPayment(withParams: paymentIntentParams, authenticationContext: self) { (status, paymentIntent, error) in
+
+                    self.stopLoading()
+
+                    var resultString = ""
+
+                    switch (status) {
+                    case .canceled:
+                        resultString = "Payment canceled"
+                    case .failed:
+                        resultString = "Payment failed"
+                    case .succeeded:
+                        resultString = "Payment successful"
+                    @unknown default:
+                        fatalError()
+                    }
+                    print(error?.localizedDescription ?? "")
+                    print(resultString)
+                    self.displayStatus(resultString)
+                }
+            }
+        }
     }
+
+    func createPaymentIntent(completion: @escaping STPJSONResponseCompletionBlock) {
+        var url = URL(string: backendURL)!
+        url.appendPathComponent("create_payment_intent")
+        let parameters: [String: String] = [
+            "country": "mx"
+        ]
+
+        AF.request(url, method: .post, parameters: parameters, encoding: JSONEncoding.default)
+            .validate(statusCode: 200..<300)
+            .responseJSON { (response) in
+                switch (response.result) {
+                case .failure(let error):
+                    completion(nil, error)
+                case .success(let json):
+                    completion(json as? [String : Any], nil)
+                }
+        }
+    }
+
     // MARK: STPAuthenticationContext Delegate
 
     func authenticationPresentingViewController() -> UIViewController {
