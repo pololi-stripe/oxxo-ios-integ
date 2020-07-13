@@ -1,6 +1,7 @@
 # oxxo-ios-integ
 ## Setup
 
+0. `gem install cocoapods` if you don't have `pod` on your laptop. [https://cocoapods.org/](https://cocoapods.org/)
 1. clonet the repo
 2. Run `pod install`
 3. Update [AppDelegate.swift](https://github.com/pololi-stripe/oxxo-ios-integ/blob/master/oxxo-ios-integ/AppDelegate.swift#L20) to use your own stripe public key
